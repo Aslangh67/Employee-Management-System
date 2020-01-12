@@ -31,10 +31,10 @@ function start() {
         add();
       }
       else if (answer.opt === "VIEW a department, employee, or a role") {
-        update()
+        view()
       }
        else if (answer.opt === "UPDATE employee role") {
-      
+      update()
       } 
       else {
         connection.end();
@@ -96,15 +96,30 @@ function add() {
             {
               name: "id",
               type: "input",
-              message: "Employee's ID#:"
+              message: "Employee's department ID#:"
             },
             {
               name: "mid",
               type: "input",
-              message: "The Manager's ID#:"
+              message: "Employee's Manager ID#:"
             }
 
           ]).then(function (answer) {
+            if(answer.mid===""){
+              connection.query(
+                "INSERT INTO employee SET ?",
+                {
+                  first_name: answer.name,
+                  last_name: answer.last,
+                  role_id: answer.id
+                },
+  
+                function (err) {
+                  if (err) throw err;
+                  start();
+                }
+              );
+            }else{
             connection.query(
               "INSERT INTO employee SET ?",
               {
@@ -120,10 +135,8 @@ function add() {
                 start();
               }
             );
-          })
-
-
-      } else {
+          }
+          }) } else {
         inquirer
           .prompt([
             {
@@ -135,6 +148,11 @@ function add() {
               name: "salary",
               type: "input",
               message: "New role's salary:"
+            },
+            {
+              name: "depId",
+              type: "input",
+              message: "New role's department id:"
             }
 
           ]).then(function (answer) {
@@ -143,6 +161,7 @@ function add() {
               {
                 title: answer.title,
                 salary: answer.salary,
+                department_id: answer.depId
               },
 
               function (err) {
@@ -156,7 +175,7 @@ function add() {
 
     });
 }
-function update(){
+function view(){
   inquirer
   .prompt({
     name: "view",
@@ -184,5 +203,39 @@ function update(){
         start()
       });
     }
+  })
+}
+function update(){
+  inquirer
+  .prompt([
+    {
+      name: "empId",
+      type: "input",
+      message: "Enter employee's ID#:"
+    },{
+      name: "newRoleId",
+      type: "input",
+      message: "Enter new role's ID#:"
+    }
+
+  ]).then(function(answer){
+    
+    connection.query(
+      "UPDATE employee SET ? WHERE ?",
+      [
+        {
+          role_id:parseInt (answer.newRoleId)
+        },
+        {
+          id: answer.empId
+        }
+      ],
+      function(err, res) {
+        if (err) throw err;
+        
+        
+        start();
+      }
+    );
   })
 }
