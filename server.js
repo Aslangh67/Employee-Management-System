@@ -49,7 +49,7 @@ function add() {
     .prompt({
       name: "adding",
       type: "list",
-      message: "Please chose an option?",
+      message: "Please chose an option.",
       choices: ["ADD a department", "ADD an employee", "ADD a role"]
     })
     .then(function (answer) {
@@ -181,28 +181,16 @@ function view(){
     name: "view",
     type: "list",
     message: "Please chose an option?",
-    choices: ["View departments", "View employees", "View roles"]
+    choices: ["department", "employee", "role"]
   }).then(function(answer){
-    if(answer.view==="View departments"){
-      connection.query("SELECT * FROM department", function(err, res) {
+    
+      connection.query(`SELECT * FROM ${answer.view}`, function(err, res) {
         if (err) throw err;
         console.table(res);
         start()
       });
 
-    }else if(answer.view==="View employees"){
-      connection.query("SELECT * FROM employee", function(err, res) {
-        if (err) throw err;
-        console.table(res);
-        start()
-      });
-    }else{
-      connection.query("SELECT * FROM role", function(err, res) {
-        if (err) throw err;
-        console.table(res);
-        start()
-      });
-    }
+
   })
 }
 function update(){
