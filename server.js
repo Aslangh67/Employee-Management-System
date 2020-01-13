@@ -137,8 +137,10 @@ function add() {
             );
           }
           }) } else {
-        inquirer
-          .prompt([
+            connection.query(`SELECT * FROM department`, function(err, results) {
+              if (err) throw err;
+        inquirer.prompt([
+          
             {
               name: "title",
               type: "input",
@@ -151,17 +153,31 @@ function add() {
             },
             {
               name: "depId",
-              type: "input",
-              message: "New role's department id:"
+              type: "rawlist",
+              choices: function() {
+                var choiceArray = [];
+                for (var i = 0; i < results.length; i++) {
+                  choiceArray.push(results[i].name);
+                }
+                return choiceArray;
+              },
+              message: "New role's department"
             }
 
           ]).then(function (answer) {
+            var chosenItem;
+        for (var i = 0; i < results.length; i++) {
+          if (results[i].item_name === answer.choice) {
+            chosenItem = results[i];
+          }
+        }
+        
             connection.query(
               "INSERT INTO role SET ?",
               {
                 title: answer.title,
                 salary: answer.salary,
-                department_id: answer.depId
+                department_id: chosenItem.id
               },
 
               function (err) {
@@ -170,6 +186,7 @@ function add() {
               }
             );
           })
+        });
 
       }
 
