@@ -212,7 +212,7 @@ function update(){
       "UPDATE employee SET ? WHERE ?",
       [
         {
-          role_id:parseInt (answer.newRoleId)
+          role_id:answer.newRoleId
         },
         {
           id: answer.empId
