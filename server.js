@@ -80,7 +80,27 @@ function add() {
           )
       }
       else if (answer.adding === "ADD an employee") {
+        connection.query(`SELECT * FROM role`, function(err, results) {
+          if (err) throw err;
+        
+        let roles=results.map(function(results){
+          return {name: results.title,
+           value:results.id}
+         })
 
+        
+        connection.query(`SELECT * FROM employee`, function(err, results) {
+        if (err) throw err
+        
+        let employees=results.map(function(results){
+         return ({name: `${results.first_name} ${results.last_name}`,
+          value:results.id})
+        })
+        employees.unshift({
+          name: "None",
+          value: ""
+        })
+        
         inquirer
           .prompt([
             {
@@ -95,13 +115,15 @@ function add() {
             },
             {
               name: "id",
-              type: "input",
-              message: "Employee's department ID#:"
+              type: "rawlist",
+              choices: roles,
+              message: "Employee's department:"
             },
             {
               name: "mid",
-              type: "input",
-              message: "Employee's Manager ID#:"
+              type: "rawlist",
+              choices: employees,
+              message: "Employee's Manager:"
             }
 
           ]).then(function (answer) {
@@ -127,7 +149,6 @@ function add() {
                 last_name: answer.last,
                 role_id: answer.id,
                 manager_id: answer.mid
-
               },
 
               function (err) {
@@ -136,9 +157,14 @@ function add() {
               }
             );
           }
-          }) } else {
+          })
+        })
+        })
+       } else {
             connection.query(`SELECT * FROM department`, function(err, results) {
               if (err) throw err;
+              console.log(results);
+              
         inquirer.prompt([
           
             {
@@ -157,7 +183,9 @@ function add() {
               choices: function() {
                 var choiceArray = [];
                 for (var i = 0; i < results.length; i++) {
-                  choiceArray.push(results[i].name);
+                  choiceArray.push({name :results[i].name,
+                    value: results[i].id
+                  });
                 }
                 return choiceArray;
               },
@@ -165,19 +193,13 @@ function add() {
             }
 
           ]).then(function (answer) {
-            var chosenItem;
-        for (var i = 0; i < results.length; i++) {
-          if (results[i].item_name === answer.choice) {
-            chosenItem = results[i];
-          }
-        }
-        
+
             connection.query(
               "INSERT INTO role SET ?",
               {
                 title: answer.title,
                 salary: answer.salary,
-                department_id: chosenItem.id
+                department_id: answer.depId
               },
 
               function (err) {
