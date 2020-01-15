@@ -41,4 +41,4 @@ I want to be able to view and manage the departments, roles, and employees in my
 So that I can organize and plan my business
 ```
 
-To download this program simply clone this repo, and type **node server.js** in the command line.
+To download this program simply clone this repo, and type **npm i** in the command line, and then type **node server.js** in the command line to run the program.
