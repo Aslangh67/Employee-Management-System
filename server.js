@@ -1,7 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 
-
 var connection = mysql.createConnection({
   host: "localhost",
 
@@ -42,8 +41,6 @@ function start() {
       }
     });
 }
-
-
 function add() {
   inquirer
     .prompt({
@@ -163,7 +160,11 @@ function add() {
        } else {
             connection.query(`SELECT * FROM department`, function(err, results) {
               if (err) throw err;
-              console.log(results);
+              
+              const department=results.map(function(results){
+               return ({name:results.name,
+                value:results.id})
+              })
               
         inquirer.prompt([
           
@@ -180,15 +181,7 @@ function add() {
             {
               name: "depId",
               type: "rawlist",
-              choices: function() {
-                var choiceArray = [];
-                for (var i = 0; i < results.length; i++) {
-                  choiceArray.push({name :results[i].name,
-                    value: results[i].id
-                  });
-                }
-                return choiceArray;
-              },
+              choices: department,
               message: "New role's department"
             }
 
@@ -233,16 +226,35 @@ function view(){
   })
 }
 function update(){
+  connection.query(`SELECT * FROM role`, function(err, results) {
+    if (err) throw err;
+  
+  let roles=results.map(function(results){
+    return {name: results.title,
+     value:results.id}
+   })
+
+  
+  connection.query(`SELECT * FROM employee`, function(err, results) {
+  if (err) throw err
+  
+  let employees=results.map(function(results){
+   return ({name: `${results.first_name} ${results.last_name}`,
+    value:results.id})
+  })
+
   inquirer
   .prompt([
     {
       name: "empId",
-      type: "input",
-      message: "Enter employee's ID#:"
+      type: "rawlist",
+      choices: employees,
+      message: "Choose employee:"
     },{
       name: "newRoleId",
-      type: "input",
-      message: "Enter new role's ID#:"
+      type: "rawlist",
+      choices: roles,
+      message: "Choose new role:"
     }
 
   ]).then(function(answer){
@@ -265,4 +277,6 @@ function update(){
       }
     );
   })
+})
+})
 }
